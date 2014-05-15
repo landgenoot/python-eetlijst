@@ -7,14 +7,14 @@ import eetlijst
 import sys
 
 def main():
-    if len(sys.argv) != 4:
-        sys.stdout.write("Usage: %s <get|set> <username> <password>\n" % sys.argv[0])
+    if len(sys.argv) < 4:
+        sys.stdout.write("Usage: <username> <password> <get|set|prepend> <message>\n" % sys.argv[0])
         return 0
 
     # Parse action
     action = sys.argv[3].lower()
 
-    if action not in ["get", "set"]:
+    if action not in ["get", "set", "prepend"]:
         sys.stdout.write("Invalid action: %s\n" % action)
         return 1
 
@@ -28,8 +28,10 @@ def main():
     # Perform action
     if action == "get":
         get_action(client)
-    else:
+    elif action == "set":
         set_action(client)
+    else:
+        prepend_action(client)
 
     return 0
 
@@ -43,6 +45,16 @@ def set_action(client):
     message = sys.stdin.readline().strip()
 
     if len(message) == 0:
+        sys.stdout.write("Empty message. Noticeboard not changed\n")
+        return 1
+
+    client.set_noticeboard(message)
+    sys.stdout.write("Notice board updated\n")
+
+def prepend_action(client):
+    message =  sys.argv[4] + "\n----------------------------------------------------------------------------------------------------------\n"+ client.get_noticeboard()
+
+    if len(sys.argv[4]) == 0:
         sys.stdout.write("Empty message. Noticeboard not changed\n")
         return 1
 
